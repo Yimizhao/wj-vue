@@ -1,8 +1,8 @@
 <template>
-  <body id="poster">
+  <body id="paper">
   <el-form class="login-container" label-position="left"
-           label-width="0px">
-    <h3 class="login_title">系统登录</h3>
+           label-width="0px" v-loading="loading">
+    <h3 class="login_title">用户注册</h3>
     <el-form-item>
       <el-input type="text" v-model="loginForm.username"
                 auto-complete="off" placeholder="账号"></el-input>
@@ -12,40 +12,41 @@
                 auto-complete="off" placeholder="密码"></el-input>
     </el-form-item>
     <el-form-item style="width: 100%">
-      <el-button type="primary" style="width: 100%;background: #505458;border: none" v-on:click="login">登录</el-button>
+      <el-button type="primary" style="width: 40%;background: #505458;border: none" v-on:click="register">注册</el-button>
     </el-form-item>
   </el-form>
   </body>
-
 </template>
-
 <script>
-
 export default {
-  name: 'Login',
   data () {
     return {
+      checked: true,
       loginForm: {
         username: '',
         password: ''
       },
-      responseResult: []
+      loading: false
     }
   },
   methods: {
-    login () {
-      var _this = this
+    register () {
+      // let _this = this
       this.$axios
-        .post('/login', {
+        .post('/register', {
           username: this.loginForm.username,
           password: this.loginForm.password
         })
-        .then(successResponse => {
-          if (successResponse.data.code === '200') {
-            // var data = this.loginForm
-            _this.$store.commit('login', _this.loginForm)
-            var path = this.$route.query.redirect
-            this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
+        .then(resp => {
+          if (resp.data.code === '200') {
+            this.$alert('注册成功', '提示', {
+              confirmButtonText: '确定'
+            })
+            this.$router.replace('/login')
+          } else {
+            this.$alert(resp.data.message, '提示', {
+              confirmButtonText: '确定'
+            })
           }
         })
         .catch(failResponse => {
@@ -54,8 +55,19 @@ export default {
   }
 }
 </script>
+<style>
+#paper {
+  background: url("../assets/yun.jpg") no-repeat center;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  position: fixed;
+}
 
-<style scoped>
+body, html {
+  height: 100%;
+}
+
 .login-container {
   border-radius: 15px;
   background-clip: padding-box;
@@ -71,17 +83,5 @@ export default {
   margin: 0px auto 40px auto;
   text-align: center;
   color: #505458;
-}
-
-#poster {
-  background: url("../assets/yun.jpg") no-repeat center;
-  height: 100%;
-  width: 100%;
-  background-size: cover;
-  position: fixed;
-}
-
-body, html {
-  height: 100%;
 }
 </style>
